@@ -11,12 +11,12 @@ const config: Config = {
   url: 'https://rizzi-ponderada.io/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/atividade-ponderada-m7/',
+  baseUrl: '/Atividade-Ponderada-M7/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'Inteli-College', // Usually your GitHub org/user name.
-  projectName: 'atividade-ponderada-m7', // Usually your repo name.
+  projectName: 'Atividade-Ponderada-M7', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
