@@ -1,0 +1,8 @@
+{
+    "label": "Etapas",
+    "position": 1,
+    "link": {
+        "type": "generated-index",
+        "description": "Registro de desenvolvimento do projeto separado por etapas." 
+    }
+}
