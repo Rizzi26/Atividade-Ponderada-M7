@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import predict, user
+from routers import predict, user, logs
 import uvicorn
 
 
@@ -8,6 +8,7 @@ app = FastAPI()
 
 app.include_router(predict.router)
 app.include_router(user.router)
+app.include_router(logs.router)
 
 app.add_middleware(
     CORSMiddleware,

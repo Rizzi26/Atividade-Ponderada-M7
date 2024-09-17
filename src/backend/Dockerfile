@@ -1,4 +1,6 @@
-FROM python:3.10-slim
+FROM python:3.11-bullseye
+
+EXPOSE 8000
 
 WORKDIR /app
 

@@ -1,9 +1,15 @@
-from typing import Optional
-from datetime import datetime
 from pydantic import BaseModel, Field
 
 class Predict(BaseModel):
-    id: int = Field(default=None, gt=0)
-    date: Optional[datetime] = Field(default=None)
-    username: str = Field(default=None)
-    user_id: int = Field(default=None)
+    id: int
+    date: str
+    username: str
+    forecast: bool
+    forecast_result: str
+    user_id: int 
+
+class Predict_update(BaseModel):
+    username: str
+    forecast: bool
+    forecast_result: str
+

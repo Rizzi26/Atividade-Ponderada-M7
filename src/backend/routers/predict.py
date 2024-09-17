@@ -1,13 +1,11 @@
-from datetime import datetime
-from uuid import UUID
-
-import ormar
-from fastapi import HTTPException
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, Depends, status
+# from utils.predict import prediction
+from schemas.predict import Predict, Predict_update
+from supabase import Client
+from database.supabase import create_supabase_client
+from typing import Any
 from fastapi.responses import JSONResponse
-from models.predict import Predict as PredictModel
-from schemas.predict import Predict
-from ormar.exceptions import NoMatch
+import traceback
 
 
 router = APIRouter(
@@ -15,109 +13,108 @@ router = APIRouter(
     tags=["predicts"],
 )
 
-@router.post("/register")
-async def register(predict: Predict):
-    try:
-        await PredictModel.objects.create(
-            date = predict.date,
-            emergency_button = predict.emergency_button,
-            ia_request = predict.ia_request,
-            user_id = predict.user_id
-        )
-        return JSONResponse(content={
-            "error": False,
-            "message": "predict criado com sucesso"
-        }, status_code=201)
-    except Exception as e:
-        return JSONResponse(content={
-            "error": True,
-            "message": f"Erro interno do servidor: {e}"
-        }, status_code=500)
+# @router.post("/predict/")
+# async def predict_knr(data: Predict, supabase: Client = Depends(create_supabase_client)) -> Any:
+#     # Extraindo dados da requisição
+#     username = data.username
+#     user_id = data.user_id
+#     forecast = data.forecast
 
-@router.get("/list")
-async def list_predicts():
-    try:
-        predicts = await PredictModel.objects.all()
-        if not predicts:
-            return JSONResponse(content={
-                "error": True,
-                "message": "Nenhum predict encontrado"
-            }, status_code=404)
-        
-        predict_dicts = []
-        for predict in predicts:
-            predict_dict = predict.dict()
-            for key, value in predict_dict.items():
-                if isinstance(value, datetime):
-                    predict_dict[key] = value.isoformat()
-            predict_dicts.append(predict_dict)
+#     if forecast:
+#         prediction()
 
-        return JSONResponse(content={
-            "error": False,
-            "message": "predicts encontrados com sucesso",
-            "data": predict_dicts
-        }, status_code=200)
-    except Exception as e:
-        return JSONResponse(content={
-            "error": True,
-            "message": f"Erro interno do servidor: {e}"
-        }, status_code=500)
+#     # Chamando a função de previsão com os parâmetros adequados
+#     try:
+#         prediction_result = prediction(username=username, user_id=user_id, supabase=supabase)
+#         return {"success": True, "prediction": prediction_result}
+#     except Exception as e:
+#         return {"success": False, "error": str(e)}
 
-@router.get("/list/{predict_id}")
-async def list(predict_id: int):
+@router.get("/list/")
+async def list_predict():
+    supabase = create_supabase_client()
+
     try:
-        predict = await PredictModel.objects.get(id=predict_id)
-        print(predict)
-        return JSONResponse(content={
-            "error": False,
-            "predict": predict
-        }, status_code=200)
-    except ormar.NoMatch:
-        return JSONResponse(content={
-            "error": True,
-            "message": "predict não encontrado"
-        }, status_code=404)
+        response = supabase.table('predict').select("*").execute()
+
+        if response.data:
+            return {"message": "Lista de predicts na base", "predict": response.data}
+        else:
+            return JSONResponse(content={"error": "Nenhuma predict encontrada"}, status_code=404)
+
     except Exception as e:
-        return JSONResponse(content={
-            "error": True,
-            "message": f"Erro interno do servidor: {e}"
-        }, status_code=500)
+        error_trace = traceback.format_exc()
+        print(f"Full error trace: {error_trace}")
+        return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
+
+@router.get("/get/{predict_id}")
+async def get_predict(predict_id: int):
+    supabase = create_supabase_client()
+
+    try: 
+        response = supabase.table('predict').select("*").eq("id", predict_id).execute()
+
+        if response.data:
+            return {"message": "Predict requisitada", "user": response.data}
+        else:
+            return JSONResponse(content={"error": "Nenhuma Predict encontrada"}, status_code=404)
+
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(f"Full error trace: {error_trace}")
+        return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
+
 
 @router.put("/update/{predict_id}")
-async def update(predict_id: int, predict_update: Predict):
-    try:
-        existing_predict = await PredictModel.objects.get_or_none(id=predict_id)
-        if existing_predict is None:
-            raise HTTPException(status_code=404, detail="predict não encontrado")
+async def update_user(predict_id: int, predict_update: Predict_update):
+    supabase = create_supabase_client()
 
-        predict_update_data = predict_update.dict(exclude_unset=True)
-        for field, value in predict_update_data.items():
-            if isinstance(value, datetime):
-                predict_update_data[field] = value.isoformat()
+    try: 
+        response = supabase.table('predict').select("*").eq("id", predict_id).execute()
 
-        await existing_predict.update(**predict_update_data)
+        if response.data:
+            response = supabase.table('predict').update({
+                "username_predict": predict_update.username,
+                "forecast": predict_update.forecast,
+                "forecast_result": predict_update.forecast
+            }).eq("id", predict_id).execute()
 
-        return {"error": False, "message": "predict atualizado com sucesso"}
+            return {"message": "Predict atualizada com sucesso", "predict": response.data}
+        else:
+            return JSONResponse(content={"error": "Nenhuma predict encontrada"}, status_code=404)
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro interno do servidor: {e}")
+        error_trace = traceback.format_exc()
+        print(f"Full error trace: {error_trace}")
+        return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
 
 
 
 @router.delete("/delete/{predict_id}")
-async def delete(predict_id: int):
+async def delete_predict(predict_id: int):
+    supabase = create_supabase_client()
+
     try:
-        await PredictModel.objects.delete(id=predict_id)
-        return JSONResponse(content={
-            "error": False,
-            "message": "predict deletado com sucesso"
-        }, status_code=200)
-    except ormar.NoMatch:
-        return JSONResponse(content={
-            "error": True,
-            "message": "predict não encontrado"
-        }, status_code=404)
+        response = supabase.table('predict').select("*").eq("id", predict_id).execute()
+
+        if response.data:
+            response = supabase.table('predict').delete().eq("id", predict_id).execute()
+
+            return JSONResponse(content={
+                "error": False,
+                "message": "Predict deletada com sucesso"
+            }, status_code=200)
+        else:
+            return JSONResponse(content={
+                "error": True,
+                "message": "Predict não encontrada"
+            }, status_code=404)
+
     except Exception as e:
+        error_trace = traceback.format_exc()
+        print(f"Full error trace: {error_trace}")
         return JSONResponse(content={
             "error": True,
-            "message": f"Erro interno do servidor: {e}"
+            "message": f"Erro interno do servidor: {e}",
+            "trace": error_trace
         }, status_code=500)
