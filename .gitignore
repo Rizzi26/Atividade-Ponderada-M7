@@ -1,0 +1,6 @@
+venv/
+.env
+src/postgres_data
+src/backend/notebooks/.ipy_checkpoints
+
+__pycache__/

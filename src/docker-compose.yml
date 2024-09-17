@@ -1,0 +1,26 @@
+services:
+  frontend:
+    build: ./frontend
+    image: src/frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_BACKEND_URL: "http://backend:3000"
+    ports:
+      - "3000:3000"
+    container_name: ponderada-frontend
+
+  backend:
+    build: ./backend
+    image: src/backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "8000:8000"
+    container_name: ponderada-backend
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app/backend  
+
+
