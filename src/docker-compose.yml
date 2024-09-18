@@ -1,13 +1,19 @@
+version: '3.8'
+
 services:
   frontend:
     build: ./frontend
     image: src/frontend
+    container_name: frontend
     restart: unless-stopped
     environment:
-      NEXT_PUBLIC_BACKEND_URL: "http://backend:3000"
+      NEXT_PUBLIC_BACKEND_URL: "http://backend:8000" 
     ports:
-      - "3000:3000"
-    container_name: ponderada-frontend
+      - "3000:3000"  
+    networks:
+      - app-network
+    depends_on:
+      - backend  
 
   backend:
     build: ./backend
@@ -16,11 +22,15 @@ services:
     environment:
       DATABASE_URL: ${DATABASE_URL}
     ports:
-      - "8000:8000"
-    container_name: ponderada-backend
+      - "8000:8000"  
+    container_name: backend
     env_file:
       - .env
     volumes:
       - ./backend:/app/backend  
+    networks:
+      - app-network
 
-
+networks:
+  app-network:
+    driver: bridge

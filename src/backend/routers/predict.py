@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-# from utils.predict import prediction
+from utils.lstm.PredictLstm import main
 from schemas.predict import Predict, Predict_update
 from supabase import Client
 from database.supabase import create_supabase_client
@@ -8,27 +8,28 @@ from fastapi.responses import JSONResponse
 import traceback
 
 
+
 router = APIRouter(
     prefix="/predicts",
     tags=["predicts"],
 )
 
-# @router.post("/predict/")
-# async def predict_knr(data: Predict, supabase: Client = Depends(create_supabase_client)) -> Any:
-#     # Extraindo dados da requisição
-#     username = data.username
-#     user_id = data.user_id
-#     forecast = data.forecast
+@router.post("/predict/")
+async def predict_knr(data: Predict, supabase: Client = Depends(create_supabase_client)) -> Any:
+    # Extraindo dados da requisição
+    username = data.username
+    user_id = data.user_id
+    forecast = data.forecast
 
-#     if forecast:
-#         prediction()
+    if forecast:
+        main()
 
-#     # Chamando a função de previsão com os parâmetros adequados
-#     try:
-#         prediction_result = prediction(username=username, user_id=user_id, supabase=supabase)
-#         return {"success": True, "prediction": prediction_result}
-#     except Exception as e:
-#         return {"success": False, "error": str(e)}
+    # Chamando a função de previsão com os parâmetros adequados
+    try:
+        prediction_result = main()
+        return {"success": True, "prediction": prediction_result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 @router.get("/list/")
 async def list_predict():
@@ -76,7 +77,8 @@ async def update_user(predict_id: int, predict_update: Predict_update):
             response = supabase.table('predict').update({
                 "username_predict": predict_update.username,
                 "forecast": predict_update.forecast,
-                "forecast_result": predict_update.forecast
+                "forecast_result": predict_update.forecast,
+                "model": predict_update.model
             }).eq("id", predict_id).execute()
 
             return {"message": "Predict atualizada com sucesso", "predict": response.data}
