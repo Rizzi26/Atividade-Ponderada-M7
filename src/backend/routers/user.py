@@ -81,12 +81,12 @@ async def list_users():
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
 
 
-@router.get("/get/{user_id}")
-async def get_user(user_id: int):
+@router.get("/get/{username}")
+async def get_user(username: str):
     supabase = create_supabase_client()
 
     try: 
-        response = supabase.table('users').select("*").eq("id", user_id).execute()
+        response = supabase.table('users').select("*").eq("username", username).execute()
 
         if response.data:
             return {"message": "Usuário requisitado", "user": response.data}

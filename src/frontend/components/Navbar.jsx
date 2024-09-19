@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
-const Navbar = () => {
+const Navbar = ({ id }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter(); // Hook para obter a rota atual
 
@@ -11,6 +11,14 @@ const Navbar = () => {
 
   // Função para verificar se a rota está ativa
   const isActive = (pathname) => router.pathname === pathname;
+
+  // Função para navegar mantendo o parâmetro 'id'
+  const navigateWithId = (path) => {
+    router.push({
+      pathname: path,
+      query: { id }, // Inclui o parâmetro 'id' na URL
+    });
+  };
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900">
@@ -34,44 +42,44 @@ const Navbar = () => {
         <div className={`w-full md:block md:w-auto ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-default">
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             <li>
-              <a
-                href="/home"
+              <button
+                onClick={() => navigateWithId('/home')}
                 className={`block py-2 px-3 rounded md:p-0 ${
                   isActive('/home') ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 dark:text-white md:dark:text-blue-500' : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
                 }`}
               >
                 Home
-              </a>
+              </button>
             </li>
             <li>
-              <a
-                href="/new-predict"
+              <button
+                onClick={() => navigateWithId('/new-predict')}
                 className={`block py-2 px-3 rounded md:p-0 ${
                   isActive('/new-predict') ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 dark:text-white md:dark:text-blue-500' : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
                 }`}
               >
                 New Predict
-              </a>
+              </button>
             </li>
             <li>
-              <a
-                href="/pricing"
+              <button
+                onClick={() => navigateWithId('/pricing')}
                 className={`block py-2 px-3 rounded md:p-0 ${
                   isActive('/pricing') ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 dark:text-white md:dark:text-blue-500' : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
                 }`}
               >
                 Pricing now
-              </a>
+              </button>
             </li>
             <li>
-              <a
-                href="/logs"
+              <button
+                onClick={() => navigateWithId('/logs')}
                 className={`block py-2 px-3 rounded md:p-0 ${
                   isActive('/logs') ? 'text-white bg-blue-700 md:bg-transparent md:text-blue-700 dark:text-white md:dark:text-blue-500' : 'text-gray-900 hover:bg-gray-100 md:hover:bg-transparent md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
                 }`}
               >
                 Logs
-              </a>
+              </button>
             </li>
           </ul>
         </div>

@@ -1,13 +1,23 @@
-import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import Navbar from './Navbar'; // Importa o componente da Navbar
 
-const Home = () => {
+const HomePage = () => {
+  const router = useRouter();
+
+  // Obtém o valor do parâmetro 'id' da URL
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  const paramValue = urlParams.get('id');
+
+  console.log(paramValue); // Exibe o valor de 'id' no console
+
   return (
-    <div className="flex items-center justify-center min-h-screen text-white">
-        <h1>Olaaa mundo</h1>
+    <div>
+      <Navbar id={paramValue} /> {/* Passa o valor de 'id' para a Navbar */}
+      <h1>Bem-vindo!</h1>
     </div>
   );
 };
 
-export default Home;
+export default HomePage;

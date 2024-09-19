@@ -1,3 +1,4 @@
+// pages/login.js
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
@@ -5,6 +6,7 @@ import { toast } from 'react-toastify';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
 
@@ -17,20 +19,23 @@ const Login = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }), // Envia os dados do login
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Login bem-sucedido
         toast.success('Login bem-sucedido!');
-        setTimeout(() => {
-          router.push('/home'); // Redireciona para a página inicial
-        }, 1000);
+        console.log('Resposta da API:', data); 
+        const userId = data.user?.id; 
+        if (userId) {
+          router.push(`/home?id=${userId}`);
+        } else {
+          toast.error('ID do usuário não encontrado.');
+          setError('ID do usuário não encontrado.');
+        }
       } else {
-        // Erro no login
-        toast.error('Usuarios ou senha incorreta!');
+        toast.error('Usuário ou senha incorreta!');
         setError(data.error || 'Erro ao fazer login');
       }
     } catch (err) {
@@ -43,7 +48,6 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen text-black">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
-
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4 mt-4">
           <label className="flex flex-col">
             Username:
@@ -57,18 +61,24 @@ const Login = () => {
           </label>
           <label className="flex flex-col">
             Senha:
-            <input
-              type="password" // Mudei para tipo "password" para esconder a senha
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 p-2 border border-gray-300 rounded w-full"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-2 text-gray-600"
+              >
+                {showPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
+            </div>
           </label>
-
-          {/* Exibe a mensagem de erro caso os dados estejam incorretos */}
           {error && <p className="text-red-500 text-center">{error}</p>}
-
           <button
             type="submit"
             className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
