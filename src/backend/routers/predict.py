@@ -31,7 +31,7 @@ async def predict_knr(modelo: str, data: Predict):
 
     model_path = f'utils/{modelo}/model_{modelo}.pkl'  
 
-    forecast_days = 7  
+    forecast_days = data.days  
 
     if data.forecast:
         try:

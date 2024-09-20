@@ -1,6 +1,6 @@
 import ormar
 import ormar.exceptions
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from schemas.logs import LogCreate, LogUpdate
 import pytz 
@@ -19,24 +19,52 @@ def get_formatted_datetime():
     now = datetime.now(SAO_PAULO_TZ)
     return now.strftime('%d/%m/%Y_%Hh%M')
 
-@router.post("/register/")
-async def create_log(log: LogCreate):
+# @router.post("/register/")
+# async def create_log(log: LogCreate):
+#     supabase = create_supabase_client()
+
+#     try:
+#         response = supabase.table('logs').insert({
+#             "username_log": log.username_log,
+#             "action": log.action,
+#             "user_id": log.user_id,
+#             "date": get_formatted_datetime()
+#         }).execute()
+
+#         return response.data
+#     except Exception as e:
+#         error_trace = traceback.format_exc()
+#         print(f"Full error trace: {error_trace}")
+
+#         return JSONResponse(content={"error": str(e), "trace": error_trace}, status_code=400)
+
+async def create_log(username_log: str, action: str, user_id: int = None):
     supabase = create_supabase_client()
 
     try:
-        response = supabase.table('logs').insert({
-            "username_log": log.username_log,
-            "action": log.action,
-            "user_id": log.user_id,
+        # Cria o payload para o log
+        log_data = {
+            "username_log": username_log,
+            "action": action,
             "date": get_formatted_datetime()
-        }).execute()
+        }
 
+        # Adiciona o user_id ao payload se ele estiver presente
+        if user_id is not None:
+            log_data["user_id"] = user_id
+
+        # Executa a inserção no banco de dados do Supabase
+        response = supabase.table('logs').insert(log_data).execute()
+
+        # Retorna os dados inseridos
         return response.data
+
     except Exception as e:
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
+        raise HTTPException(status_code=500, detail=f"Erro ao registrar log: {str(e)}")
 
-        return JSONResponse(content={"error": str(e), "trace": error_trace}, status_code=400)
+
     
 
 @router.get("/list/")
