@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 import traceback
 import pytz 
 from datetime import datetime
+from routers.logs import create_log 
 
 SAO_PAULO_TZ = pytz.timezone('America/Sao_Paulo')
 
@@ -24,21 +25,27 @@ def get_formatted_datetime():
 async def predict_knr(modelo: str, data: Predict):
     supabase = create_supabase_client()
 
-    print(data)
-    print(modelo)
+    print(f"Received data: {data}")
+    print(f"Model: {modelo}")
 
-    csv_file_path = 'utils/eth_historical_data.csv'  
-
-    model_path = f'utils/{modelo}/model_{modelo}.pkl'  
-
+    csv_file_path = 'backend/utils/eth_historical_data.csv'  
+    model_path = f'backend/utils/{modelo}/model_{modelo}.pkl'  
     forecast_days = data.days  
 
     if data.forecast:
         try:
+            print('Iniciando previsão...')
+            print(f"CSV file path: {csv_file_path}")
+            print(f"Model path: {model_path}")
+            print(f"Forecast days: {forecast_days}")
+
             prediction_result = main(csv_file_path, model_path, forecast_days)
+            print(f"Prediction result: {prediction_result}")
         except FileNotFoundError:
+            print(f"File not found: {csv_file_path} or {model_path}")
             return {"status": "error", "message": f"Modelo '{modelo}' não encontrado."}
         except Exception as e:
+            print(f"Error during prediction: {str(e)}")
             return {"status": "error", "message": str(e)}
 
     try:
@@ -51,8 +58,21 @@ async def predict_knr(modelo: str, data: Predict):
             "model": modelo  
         }).execute()
 
+        await create_log(
+            username_log=data.username,
+            action=f"Predict feita com sucesso com o modelo {modelo}",
+            user_id=data.user_id  
+        )
+
         return {"status": "success", "data": response.data}
     except Exception as e:
+        print(f"Error inserting data into Supabase: {str(e)}")
+        await create_log(
+            username_log=data.username,
+            action=f"Predict falhou com o modelo {modelo}",
+            user_id=data.user_id  
+        )
+
         return {"status": "error", "message": str(e)}
 
 @router.get("/list/")

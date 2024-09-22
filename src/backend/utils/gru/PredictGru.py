@@ -4,6 +4,7 @@ import pandas as pd
 import pickle
 from sklearn.preprocessing import MinMaxScaler
 import os
+from keras.models import load_model 
 
 # Função para carregar o modelo GRU
 def load_model(model_path: str):

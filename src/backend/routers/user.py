@@ -114,6 +114,24 @@ async def list_users():
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
+    
+@router.get("/get_by_id/{user_id}")
+async def get_user_by_id(user_id: int):
+    supabase = create_supabase_client()
+
+    try: 
+        response = supabase.table('users').select("*").eq("id", user_id).execute()
+
+        if response.data:
+            return {"message": "Usuário requisitado", "user": response.data}
+        else:
+            return JSONResponse(content={"error": "Nenhum usuário encontrado"}, status_code=404)
+
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        print(f"Full error trace: {error_trace}")
+        return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
+
 
 
 @router.get("/get/{username}")

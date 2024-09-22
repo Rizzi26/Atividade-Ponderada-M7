@@ -1,52 +1,26 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
-import { useRouter } from 'next/router'; // Mantém esta linha
 import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  TimeScale,
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale } from 'chart.js';
 import 'chartjs-adapter-date-fns';
 
-// Registrar os componentes do Chart.js, incluindo TimeScale
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale);
 
 const Pricing = () => {
   const [prices, setPrices] = useState([]);
   const [dates, setDates] = useState([]);
-  const [loading, setLoading] = useState(true); // Adicionando estado de carregamento
-  const [error, setError] = useState(null); // Adicionando estado de erro
-
-  const router = useRouter();
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const paramValue = urlParams.get('id');
-
-  console.log(paramValue); // Exibe o valor de 'id' no console
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPrice, setCurrentPrice] = useState(null);
+  const [latestPrediction, setLatestPrediction] = useState(null);
 
   const fetchPriceHistory = async () => {
     try {
-      const response = await axios.get(
-        'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=30'
-      );
-      
-      console.log(response.data); // Adiciona este console.log para inspecionar os dados retornados
-  
+      const response = await axios.get('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=30');
       const priceData = response.data.prices;
       const priceArray = priceData.map((price) => price[1]);
-      const dateArray = priceData.map((price) => new Date(price[0])); // Manter datas como objetos Date
-  
-      console.log('Preços:', priceArray);
-      console.log('Datas:', dateArray);
-  
+      const dateArray = priceData.map((price) => new Date(price[0]));
       setPrices(priceArray);
       setDates(dateArray);
       setLoading(false);
@@ -57,9 +31,30 @@ const Pricing = () => {
     }
   };
 
+  const fetchLatestPrediction = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/predicts/list');
+      if (response.data && response.data.predict && response.data.predict.length > 0) {
+        const sortedPredictions = response.data.predict.sort((a, b) => b.id - a.id);
+        setLatestPrediction(sortedPredictions[0]);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar última previsão:', error);
+      setError('Erro ao buscar última previsão');
+    }
+  };
+
   useEffect(() => {
     fetchPriceHistory();
+    fetchLatestPrediction();
   }, []);
+
+  // Obter o preço atual da última entrada do histórico de preços
+  useEffect(() => {
+    if (prices.length > 0) {
+      setCurrentPrice(prices[prices.length - 1]); // Último preço da lista
+    }
+  }, [prices]);
 
   const data = {
     labels: dates,
@@ -90,7 +85,7 @@ const Pricing = () => {
       x: {
         type: 'time',
         time: {
-          unit: 'day', // Granularidade do eixo X em dias
+          unit: 'day',
           tooltipFormat: 'MMM dd, yyyy',
         },
         title: {
@@ -107,7 +102,21 @@ const Pricing = () => {
     },
   };
 
-  // Verificar o estado de erro ou carregamento
+  const renderRecommendation = () => {
+    if (!latestPrediction || currentPrice === null) {
+      return null; // Retorna nada se não houver previsão ou preço atual
+    }
+
+    const predictedValue = latestPrediction.forecast_result[0]?.predicted_value; // Acessa o valor previsto
+    if (predictedValue < currentPrice) {
+      return <p className="text-red-500">Recomendado: Vender</p>;
+    } else if (predictedValue > currentPrice) {
+      return <p className="text-green-500">Recomendado: Comprar mais</p>;
+    } else {
+      return <p className="text-yellow-500">Recomendado: Manter</p>;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen text-white">
@@ -126,7 +135,7 @@ const Pricing = () => {
 
   return (
     <div>
-      <Navbar id={paramValue} />
+      <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen text-white px-20">
         <h1 className="text-2xl">Gráfico de Preços do Ethereum (Últimos 30 Dias)</h1>
         {prices.length > 0 ? (
@@ -134,6 +143,8 @@ const Pricing = () => {
         ) : (
           <p className="text-xl mt-4">Nenhum dado disponível.</p>
         )}
+        <h2 className="text-xl mt-4">Preço Atual: {currentPrice ? `$${currentPrice.toFixed(2)}` : 'N/A'}</h2>
+        {renderRecommendation()}
       </div>
     </div>
   );

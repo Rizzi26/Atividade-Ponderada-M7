@@ -4,6 +4,7 @@ import pandas as pd
 import pickle
 from sklearn.preprocessing import MinMaxScaler
 import os
+from keras.models import load_model
 
 # Função para carregar o modelo
 def load_model(model_path: str):
@@ -40,35 +41,39 @@ def predict_future_days(model, last_sequence, num_days, scaler):
 # Função principal para carregar dados, fazer a previsão e retornar o resultado formatado
 def main(csv_file_path: str, model_path: str, forecast_days: int):
     if not os.path.exists(csv_file_path):
+        print(f"CSV file not found: {csv_file_path}")
         raise FileNotFoundError(f"Arquivo CSV não encontrado: {csv_file_path}")
 
     df = pd.read_csv(csv_file_path)
+    print(f"DataFrame loaded from CSV: {df.head()}")
 
     if 'Close' not in df.columns:
+        print("Column 'Close' is missing in the CSV file.")
         raise ValueError("Arquivo CSV deve conter a coluna 'Close'.")
 
     df = df[['Close']].dropna()
 
-    # Normalizar os dados (entre 0 e 1) para facilitar o aprendizado da LSTM
+    # Normalizar os dados (entre 0 e 1)
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(df)
+    print(f"Scaled data: {scaled_data[:5]}")  # Mostrando os primeiros 5 valores escalados
 
     # Criar as sequências de dados
     time_steps = 60
     X, y = create_sequences(scaled_data, time_steps)
 
     X = np.reshape(X, (X.shape[0], X.shape[1], 1))
+    print(f"X shape: {X.shape}, y shape: {y.shape}")
 
     # Carregar o modelo
     model = load_model(model_path)
+    print("Model loaded successfully.")
 
     # Prever os próximos `forecast_days` dias
     last_sequence = scaled_data[-time_steps:].reshape(1, time_steps, 1)
     future_prices = predict_future_days(model, last_sequence, forecast_days, scaler)
 
     future_dates = [datetime.now() + timedelta(days=i) for i in range(1, forecast_days + 1)]
-
-    # Formatar a previsão para incluir o horário de fechamento (17:00) e os valores previstos
     forecast_list = [
         {
             "date": future_dates[i].strftime("%Y-%m-%d 17:00:00"),  
@@ -77,5 +82,5 @@ def main(csv_file_path: str, model_path: str, forecast_days: int):
         for i in range(forecast_days)
     ]
 
-    # Retornar as previsões como um objeto JSON direto
-    return forecast_list  # Sem serialização extra
+    return forecast_list
+

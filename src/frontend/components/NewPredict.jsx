@@ -12,36 +12,44 @@ const NewPredict = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [days, setDays] = useState('');
   const [currentPage, setCurrentPage] = useState(1); // Estado para a página atual
+  const [username, setUsername] = useState(''); // Estado para armazenar o nome do usuário
+  const [userid, setUserId] = useState('')
   const rowsPerPage = 7; // Limite de linhas por página
 
   // Captura o id do usuário da URL
   const { id } = router.query;
   const paramValue = id || ''; // Se não houver ID, valor padrão vazio
 
-  const fetchLatestPrediction = async () => {
+  const handleUser = async (paramValue) => {
     try {
-      const response = await axios.get('http://localhost:8000/predicts/list');
-      if (response.data && response.data.predict && response.data.predict.length > 0) {
-        const sortedPredictions = response.data.predict.sort((a, b) => b.id - a.id);
-        setLatestPrediction(sortedPredictions[0]);
+      const url = `http://localhost:8000/users/get_by_id/${paramValue}`;
+      const response = await axios.get(url);
+  
+      // Inspeciona toda a resposta para verificar a estrutura
+      console.log("Resposta completa da API:", response.data);
+  
+      // Verifica se existe o array 'user' e se ele tem pelo menos um item
+      if (response.data && Array.isArray(response.data.user) && response.data.user.length > 0) {
+        const user = response.data.user[0]; // Acessa o primeiro item do array
+        console.log("Usuário encontrado:", user);
+        console.log("Nome do usuário:", user.username); // Exibe o nome do usuário
+        console.log("ID do usuário:", user.id); // Exibe o id do usuário
+        setUsername(user.username);
+        setUserId(user.id);
       }
     } catch (error) {
-      console.error('Erro ao buscar última previsão:', error);
-      toast.error('Erro ao buscar última previsão.');
+      console.error("Erro ao buscar o usuário:", error.response ? error.response.data : error.message);
     }
   };
-
-  const handleUser = async () => {
-    
-  }
-
+  
+  
   const handleNewPrediction = async () => {
     setIsSubmitting(true);
     try {
       const url = `http://localhost:8000/predicts/predict/${selectedModel}`;
       const response = await axios.post(url, {
-        username: "Rizzadinha22",  // Você pode usar o username do usuário real, se disponível
-        user_id: paramValue,       // Envia o ID do usuário capturado da URL
+        username: username,  // Utiliza o username do estado
+        user_id: userid, // Envia o ID do usuário capturado da URL
         forecast: true,
         forecast_result: "string",
         days: parseInt(days)
@@ -63,9 +71,28 @@ const NewPredict = () => {
     }
   };
 
+  // Função para buscar a última previsão
+  const fetchLatestPrediction = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/predicts/list');
+      if (response.data && response.data.predict && response.data.predict.length > 0) {
+        const sortedPredictions = response.data.predict.sort((a, b) => b.id - a.id);
+        setLatestPrediction(sortedPredictions[0]);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar última previsão:', error);
+      toast.error('Erro ao buscar última previsão.');
+    }
+  };
+
   useEffect(() => {
     fetchLatestPrediction();
-  }, []);
+    
+    // Buscar o usuário quando o ID estiver disponível
+    if (paramValue) {
+      handleUser(paramValue);
+    }
+  }, [paramValue]);
 
   const formatDate = (dateString) => {
     try {
@@ -148,7 +175,8 @@ const NewPredict = () => {
         {/* Formulário de nova previsão */}
         <div className="w-full max-w-md mt-6">
           <h1 className="text-2xl font-semibold">Nova Previsão</h1>
-          <label htmlFor="modelSelect" className="block text-sm font-medium text-gray-300 mb-2">Selecione o modelo:</label>
+
+          <label htmlFor="modelSelect" className="block text-sm font-medium text-gray-300 mt-4 mb-2">Selecione o modelo:</label>
           <select
             id="modelSelect"
             value={selectedModel}
