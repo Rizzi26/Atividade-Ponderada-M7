@@ -1,5 +1,5 @@
 {
-    "label": "Exploração e Preparação dos Dados",
+    "label": "Exploração, Preparação dos Dados e treinamento dos modelos",
     "position": 1,
     "link": {
         "type": "generated-index",

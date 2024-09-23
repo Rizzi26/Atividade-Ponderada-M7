@@ -3,46 +3,42 @@ sidebar_position: 1
 slug: "/"
 ---
 
-# Tutorial Intro
+# Introdução
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Este projeto foi desenvolvido como parte das **Atividades Ponderadas do Módulo**, onde o objetivo era aplicar técnicas de **análise de dados** e **machine learning** em um cenário real para apoiar decisões de investimentos em criptoativos. Trabalhei focado no par **ETH-USD**, desenvolvendo um sistema que oferece previsões e insights baseados no histórico de preços, ajudando os usuários a tomar decisões mais embasadas sobre a compra, venda ou manutenção dos ativos.
 
-## Getting Started
+# Contexto
 
-Get started by **creating a new site**.
+A proposta da atividade envolvia construir um sistema de auxílio à decisão, analisando o comportamento histórico de um ou dois criptoativos. Escolhi o **Ethereum (ETH)** como criptoativo de referência e desenvolvi um modelo preditivo utilizando **redes neurais recorrentes (LSTM e GRU)**. O modelo foi treinado para prever o preço futuro com base em um período de tempo definido pelo usuário, proporcionando uma visão clara do que pode acontecer nos próximos dias.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+# Funcionalidades Principais
 
-### What you'll need
+O sistema que desenvolvi conta com as seguintes funcionalidades:
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+- **Previsão do preço futuro:** A partir do número de dias informado pelo usuário, o modelo gera uma previsão do preço futuro do criptoativo ETH-USD. A ideia é oferecer uma ferramenta útil para investidores que podem usar essas previsões para planejar melhor suas estratégias de compra e venda.
 
-## Generate a new site
+- **Sugestão de ação:** Com base na previsão, o sistema recomenda se o usuário deve comprar, vender ou manter o criptoativo, oferecendo insights práticos.
 
-Generate a new Docusaurus site using the **classic template**.
+- **Monitoramento em tempo real:** Criei um dashboard interativo que exibe os preços atuais do ETH-USD em tempo real, permitindo que o usuário compare o preço atual com a previsão gerada.
 
-The classic template will automatically be added to your project after you run the command:
+- **Sistema de logs:** Todas as ações realizadas no sistema são registradas, garantindo um histórico detalhado.
 
-```bash
-npm init docusaurus@latest my-website classic
-```
+# Tecnologias Utilizadas 
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
+O projeto foi desenvolvido principalmente em **Python**, usando diversas bibliotecas de machine learning para implementar os modelos LSTM e GRU. Manipulei os dados com **Pandas** e visualizei os resultados através de um dashboard interativo. Todos os dados foram armazenados em um banco de dados **PostgreSQL**, e utilizei **Docker** para garantir escalabilidade e flexibilidade.
 
-The command also installs all necessary dependencies you need to run Docusaurus.
+Algumas das tecnologias e frameworks principais que utilizei incluem:
 
-## Start your site
+- **TensorFlow/Keras** para criação e treinamento dos modelos de redes neurais.
+- **Pandas** e **NumPy** para manipulação e exploração dos dados.
+- **Matplotlib** e **Plotly** para gerar visualizações e gráficos interativos.
+- **SQLAlchemy** para a interação com o banco de dados PostgreSQL.
+- **Docker** para facilitar o ambiente de desenvolvimento e a implantação do projeto.
 
-Run the development server:
+# Metodologia de Desenvolvimento 
 
-```bash
-cd my-website
-npm run start
-```
+Segui uma abordagem em etapas, começando pela exploração dos dados para entender os padrões históricos e selecionar as variáveis mais relevantes para os modelos preditivos. O modelo foi treinado com dados históricos do ETH-USD e passou por vários testes e ajustes para garantir a maior precisão possível nas previsões.
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+# Conclusão
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+Este projeto me permitiu aplicar na prática **machine learning** e **análise de dados** para resolver problemas reais, como a previsão de preços de criptoativos. Com uma interface simples e intuitiva, logs detalhados e previsões precisas, o sistema oferece uma solução robusta para investidores que buscam apoio analítico em suas estratégias. A arquitetura modular, o uso de tecnologias modernas como **Docker** e **PostgreSQL** e o histórico do projeto garantem que ele seja escalável e flexível para futuras melhorias.

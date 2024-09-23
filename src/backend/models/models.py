@@ -17,6 +17,7 @@ class Predict(Base):
     USERNAME_PREDICT = Column(String)
     FORECAST = Column(Boolean, default=False)
     FORECAST_RESULT = Column(String)
+    MODEL = Column(String)
     USER_ID = Column(Integer, ForeignKey('users.ID'), nullable=False)
 
 class Logs(Base):

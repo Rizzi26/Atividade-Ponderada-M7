@@ -9,3 +9,4 @@ class LogCreate(BaseModel):
 class LogUpdate(BaseModel):
     username_log: str
     action: str 
+

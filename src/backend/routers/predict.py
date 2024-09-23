@@ -1,34 +1,79 @@
-from fastapi import APIRouter, HTTPException, Depends, status
-# from utils.predict import prediction
+from fastapi import APIRouter
+from utils.lstm.PredictLstm import main
 from schemas.predict import Predict, Predict_update
-from supabase import Client
 from database.supabase import create_supabase_client
 from typing import Any
 from fastapi.responses import JSONResponse
 import traceback
+import pytz 
+from datetime import datetime
+from routers.logs import create_log 
 
+SAO_PAULO_TZ = pytz.timezone('America/Sao_Paulo')
 
 router = APIRouter(
     prefix="/predicts",
     tags=["predicts"],
 )
 
-# @router.post("/predict/")
-# async def predict_knr(data: Predict, supabase: Client = Depends(create_supabase_client)) -> Any:
-#     # Extraindo dados da requisição
-#     username = data.username
-#     user_id = data.user_id
-#     forecast = data.forecast
+def get_formatted_datetime():
+    now = datetime.now(SAO_PAULO_TZ)
+    return now.strftime('%d/%m/%Y_%Hh%M')
+                      
 
-#     if forecast:
-#         prediction()
+@router.post("/predict/{modelo}")
+async def predict_knr(modelo: str, data: Predict):
+    supabase = create_supabase_client()
 
-#     # Chamando a função de previsão com os parâmetros adequados
-#     try:
-#         prediction_result = prediction(username=username, user_id=user_id, supabase=supabase)
-#         return {"success": True, "prediction": prediction_result}
-#     except Exception as e:
-#         return {"success": False, "error": str(e)}
+    print(f"Received data: {data}")
+    print(f"Model: {modelo}")
+
+    csv_file_path = 'backend/utils/eth_historical_data.csv'  
+    model_path = f'backend/utils/{modelo}/model_{modelo}.pkl'  
+    forecast_days = data.days  
+
+    if data.forecast:
+        try:
+            print('Iniciando previsão...')
+            print(f"CSV file path: {csv_file_path}")
+            print(f"Model path: {model_path}")
+            print(f"Forecast days: {forecast_days}")
+
+            prediction_result = main(csv_file_path, model_path, forecast_days)
+            print(f"Prediction result: {prediction_result}")
+        except FileNotFoundError:
+            print(f"File not found: {csv_file_path} or {model_path}")
+            return {"status": "error", "message": f"Modelo '{modelo}' não encontrado."}
+        except Exception as e:
+            print(f"Error during prediction: {str(e)}")
+            return {"status": "error", "message": str(e)}
+
+    try:
+        response = supabase.table('predict').insert({
+            "username_predict": data.username,
+            "date": get_formatted_datetime(),
+            "user_id": data.user_id,
+            "forecast": data.forecast,
+            "forecast_result": prediction_result,  
+            "model": modelo  
+        }).execute()
+
+        await create_log(
+            username_log=data.username,
+            action=f"Predict feita com sucesso com o modelo {modelo}",
+            user_id=data.user_id  
+        )
+
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        print(f"Error inserting data into Supabase: {str(e)}")
+        await create_log(
+            username_log=data.username,
+            action=f"Predict falhou com o modelo {modelo}",
+            user_id=data.user_id  
+        )
+
+        return {"status": "error", "message": str(e)}
 
 @router.get("/list/")
 async def list_predict():
@@ -76,7 +121,8 @@ async def update_user(predict_id: int, predict_update: Predict_update):
             response = supabase.table('predict').update({
                 "username_predict": predict_update.username,
                 "forecast": predict_update.forecast,
-                "forecast_result": predict_update.forecast
+                "forecast_result": predict_update.forecast,
+                "model": predict_update.model
             }).eq("id", predict_id).execute()
 
             return {"message": "Predict atualizada com sucesso", "predict": response.data}
