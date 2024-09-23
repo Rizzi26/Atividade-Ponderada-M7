@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Docs Rizzi',
   tagline: 'Dinosaurs are cool',
-  favicon: 'img/docusaurus.png',
+  favicon: 'img/docussauros.png',
 
   // Set the production url of your site here
   url: 'https://rizzi26.github.io/',
@@ -56,7 +56,7 @@ const config: Config = {
       title: 'Rizzi-Ponderada',
       logo: {
         alt: 'Rizzi-Ponderada Logo',
-        src: 'img/logo.svg',
+        src: 'img/docussauros.png',
       },
       items: [],
     },

@@ -52,6 +52,37 @@ const HomePage = () => {
             receber uma recomendação sobre se é melhor vender ou comprar a moeda em questão.
           </p>
         </div>
+
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold">Documentação</h3>
+          <p className="text-gray-300">
+            Ao clicar nesse botão abaixo você pode conferir a Documentação do projeto, onde contempla sua construção e as tecnologias utilizadas.
+          </p>
+          <a
+            href="https://rizzi26.github.io/Atividade-Ponderada-M7/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition duration-200"
+          >
+            Acessar Documentação
+          </a>
+        </div>
+
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold">GitHub</h3>
+          <p className="text-gray-300">
+            Ao clicar nesse botão abaixo você pode conferir o repositório do projeto.
+          </p>
+          <a
+            href="https://github.com/Rizzi26/Atividade-Ponderada-M7/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition duration-200"
+          >
+            Acessar Documentação
+          </a>
+        </div>
+
       </div>
     </div>
   );

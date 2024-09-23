@@ -104,10 +104,10 @@ const Pricing = () => {
 
   const renderRecommendation = () => {
     if (!latestPrediction || currentPrice === null) {
-      return null; // Retorna nada se não houver previsão ou preço atual
+      return null; 
     }
 
-    const predictedValue = latestPrediction.forecast_result[0]?.predicted_value; // Acessa o valor previsto
+    const predictedValue = latestPrediction.forecast_result[0]?.predicted_value; 
     if (predictedValue < currentPrice) {
       return <p className="text-red-500">Recomendado: Vender</p>;
     } else if (predictedValue > currentPrice) {
@@ -137,14 +137,14 @@ const Pricing = () => {
     <div>
       <Navbar />
       <div className="flex flex-col items-center justify-center min-h-screen text-white px-20">
+        <h1 className="text-2xl mt-4">Preço Atual: {currentPrice ? `$${currentPrice.toFixed(2)}` : 'N/A'}</h1>
+        {renderRecommendation()}
         <h1 className="text-2xl">Gráfico de Preços do Ethereum (Últimos 30 Dias)</h1>
         {prices.length > 0 ? (
           <Line data={data} options={options} />
         ) : (
           <p className="text-xl mt-4">Nenhum dado disponível.</p>
         )}
-        <h2 className="text-xl mt-4">Preço Atual: {currentPrice ? `$${currentPrice.toFixed(2)}` : 'N/A'}</h2>
-        {renderRecommendation()}
       </div>
     </div>
   );
