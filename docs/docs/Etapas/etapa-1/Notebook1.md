@@ -5,7 +5,15 @@ slug: "/Notebook1"
 
 # Análise Exploratória e Detecção de Anomalias no Preço do Ethereum
 
-## Coleta de dados e exploração inicial
+## Introdução
+
+&emsp;Neste notebook, decidi explorar o histórico de preços do Ethereum (ETH-USD) para realizar uma análise técnica detalhada e identificar possíveis padrões e anomalias no comportamento de seu preço ao longo do tempo. O Ethereum é uma das principais criptomoedas do mercado, e entender suas tendências de preço e volatilidade pode ser crucial para a construção de estratégias de investimento eficazes.
+
+&emsp;Utilizando bibliotecas como `yfinance`, `mplfinance`, e `scikit-learn`, coletei dados históricos desde 2020 e apliquei diferentes indicadores técnicos, como médias móveis simples e exponenciais, volatilidade, e o MACD (Moving Average Convergence Divergence). Além disso, implementei modelos de detecção de anomalias, como Z-Score e Isolation Forest, para identificar flutuações atípicas no preço de fechamento.
+
+&emsp;O objetivo deste estudo é não apenas explorar os dados históricos, mas também criar uma base sólida para futuras previsões e estratégias de trading, entendendo melhor o comportamento do mercado e as possíveis influências sobre o preço do Ethereum.
+
+### Coleta de dados e exploração inicial
 
 1. Instalação e importação de dependências
 
@@ -62,7 +70,7 @@ eth_data.to_csv('eth_historical_data.csv')
 
 - **Objetivo:** Exportar os dados históricos do ETH-USD para um arquivo CSV para fins de armazenamento e reutilização futura.
 
-## Análise exploratória e identificação de padrões
+### Análise exploratória e identificação de padrões
 
 6. Examinando o formato dos dados
 
@@ -83,6 +91,12 @@ plt.title('Preço de Fechamento e Médias Móveis')
 plt.show()
 ```
 
+<p align="center"><b> Figura 1 - Figura média móvel de 20 e 50 dias</b></p>
+<div align="center">
+  ![](../../../static/img/fechamentomm.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
+
 - **Objetivo:** Calcular e visualizar as médias móveis de 20 e 50 dias para analisar tendências de curto e médio prazo no preço de fechamento.
 
 8. Cálculo da volatilidade diária
@@ -97,6 +111,12 @@ plt.ylabel('Volatilidade')
 plt.grid(True)
 plt.show()
 ```
+
+<p align="center"><b> Figura 2 - Figura volatilidade histórica</b></p>
+<div align="center">
+  ![](../../../static/img/volatilidadehisty.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
 
 - **Objetivo:** Calcular a volatilidade histórica do Ethereum, ajudando a identificar os períodos de maior incerteza e flutuação no preço.
 
@@ -114,6 +134,12 @@ print(correlation)
 ```python
 mpf.plot(eth_data, type='candle', style='charles', volume=True, mav=(20, 50), title="Candlestick ETH/USD")
 ```
+
+<p align="center"><b> Figura 3 - Histórico de preços de fechamento Ethereum</b></p>
+<div align="center">
+  ![](../../../static/img/candle.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
 
 - **Objetivo:** Visualizar o comportamento do preço com um gráfico de candlestick, facilitando a identificação de padrões de alta e baixa no mercado.
 
@@ -134,9 +160,15 @@ plt.grid(True)
 plt.show()
 ```
 
+<p align="center"><b> Figura 4 - Calculando média móvel exponencial</b></p>
+<div align="center">
+  ![](../../../static/img/tendenciasmmex.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
+
 - **Objetivo:** Calcular e visualizar as EMAs de 50 e 200 dias para detectar tendências de longo prazo e pontos potenciais de reversão no mercado.
 
-## Identificação de anomalias
+### Identificação de anomalias
 
 12. Detecção de anomalias com Z-Score
 
@@ -154,6 +186,12 @@ plt.legend()
 plt.grid(True)
 plt.show()
 ```
+
+<p align="center"><b> Figura 5 - Identificando anomalias com Z-score</b></p>
+<div align="center">
+  ![](../../../static/img/detecanamolias.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
 
 - **Objetivo:** Identificar possíveis anomalias no preço de fechamento do Ethereum utilizando Z-Score, destacando valores que estão significativamente fora da média.
 
@@ -173,6 +211,12 @@ plt.legend()
 plt.grid(True)
 plt.show()
 ```
+
+<p align="center"><b> Figura 6 - Identificando anomalias com Isolation Forest</b></p>
+<div align="center">
+  ![](../../../static/img/isolationforest.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
 
 - **Objetivo:** Usar o Isolation Forest para detectar anomalias no preço de fechamento, onde -1 indica uma possível anomalia.
 
@@ -195,7 +239,23 @@ plt.grid(True)
 plt.show()
 ```
 
+<p align="center"><b> Figura 7 - Indicador MACD</b></p>
+<div align="center">
+  ![](../../../static/img/macd.png)
+  <p><b>Fonte:</b> Elaborado por Marco Rizzi</p>
+</div>
+
 - **Objetivo:** Calcular e visualizar o indicador MACD, que ajuda a identificar momentos de compra ou venda baseados na convergência ou divergência das médias móveis.
+
+## Conclusão
+
+&emsp;Neste notebook, realizei uma análise exploratória detalhada do histórico de preços do Ethereum (ETH-USD), incluindo o cálculo de indicadores técnicos e a detecção de anomalias. Ao longo do processo, apliquei ferramentas como médias móveis, análise de volatilidade e correlação, além de modelos de machine learning (Isolation Forest e Z-Score), o que me permitiu obter insights sobre o comportamento do preço ao longo do tempo.
+
+&emsp;Explorei diferentes tipos de gráficos, como candlesticks, médias móveis exponenciais e o indicador MACD, que me ajudaram a visualizar melhor as tendências de mercado e potenciais pontos de entrada e saída para negociações.
+
+&emsp;Ao identificar anomalias com o Z-Score e o Isolation Forest, consegui destacar períodos de volatilidade atípica e flutuações inesperadas no preço de fechamento. Isso me proporciona uma base sólida para construir estratégias mais robustas de mitigação de riscos e tomar decisões de investimento mais assertivas.
+
+&emsp;Esse estudo me preparou para futuros desenvolvimentos de modelos de previsão e estratégias de trading automatizadas, ajudando a otimizar minha tomada de decisões no mercado de criptoativos com base em dados históricos e nas tendências detectadas.
 
 
 
