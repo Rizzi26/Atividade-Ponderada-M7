@@ -18,24 +18,21 @@ router = APIRouter(
 async def create_user(user: UserCreate):
     supabase = create_supabase_client()
 
-    # Criptografa a senha do usuário
     hashed_password = get_password_hash(user.password)
 
-    # Cria um novo usuário no Supabase
     try:
         response = supabase.table('users').insert({
             "username": user.username,
             "password": hashed_password
         }).execute()
 
-        # Verifica se houve sucesso na inserção e se os dados retornam o ID
         if response.data:
-            user_id = response.data[0].get('id')  # Supõe que o ID é retornado como 'id'
+            user_id = response.data[0].get('id')  
 
             await create_log(
                 username_log=user.username,
                 action="Usuário criado com sucesso",
-                user_id=user_id  # Supondo que o ID esteja na resposta do usuário
+                user_id=user_id  
                 )
             return {"message": "Usuário criado com sucesso", "user_id": user_id}
         else:
@@ -51,24 +48,20 @@ async def login(user: UserCreate):
     supabase = create_supabase_client()
 
     try:
-        # Busca o usuário no banco de dados
         response = supabase.table('users').select("*").eq("username", user.username).execute()
 
         if response.data:
             user_data = response.data[0]
             stored_password = user_data['password']
 
-            # Verifica se a senha é válida
             if verify_password(user.password, stored_password):
-                # Cria um log de login bem-sucedido
                 await create_log(
                     username_log=user.username,
                     action="Login bem-sucedido",
-                    user_id=user_data['id']  # Supondo que o ID esteja na resposta do usuário
+                    user_id=user_data['id']  
                 )
                 return {"message": "Login bem-sucedido", "user": user_data}
             else:
-                # Cria um log de tentativa de login com senha inválida
                 await create_log(
                     username_log=user.username,
                     action="Senha inválida",
@@ -77,7 +70,6 @@ async def login(user: UserCreate):
                 return JSONResponse(content={"error": "Senha inválida"}, status_code=400)
 
         else:
-            # Cria um log de tentativa de login com usuário não encontrado
             await create_log(
                 username_log=user.username,
                 action="Usuário não encontrado",
@@ -89,14 +81,12 @@ async def login(user: UserCreate):
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
 
-        # Cria um log de erro interno ao tentar fazer login
         await create_log(
             username_log=user.username,
             action="Erro no login",
             user_id=user_data['id']
         )
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
-
 
 @router.get("/list/")
 async def list_users():
@@ -132,8 +122,6 @@ async def get_user_by_id(user_id: int):
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
 
-
-
 @router.get("/get/{username}")
 async def get_user(username: str):
     supabase = create_supabase_client()
@@ -150,7 +138,6 @@ async def get_user(username: str):
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
-
 
 @router.put("/update/{user_id}")
 async def update_user(user_id: int, user: UserCreate):
@@ -175,8 +162,6 @@ async def update_user(user_id: int, user: UserCreate):
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
-
-    
 
 @router.delete("/delete/{user_id}")
 async def delete_user(user_id: int):
