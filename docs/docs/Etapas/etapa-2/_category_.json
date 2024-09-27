@@ -1,8 +1,8 @@
 {
-    "label": "Desenvolvimento de Modelos de Machine Learning",
+    "label": "Implementação da API & Banco de dados",
     "position": 1,
     "link": {
         "type": "generated-index",
-        "description": "Registro de desenvolvimento do projeto durante a Desenvolvimento de Modelos de Machine Learning." 
+        "description": "Registro de desenvolvimento do projeto separado por Implementação da API & Banco de dados." 
     }
 }

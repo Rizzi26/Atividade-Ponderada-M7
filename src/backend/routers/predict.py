@@ -20,7 +20,6 @@ def get_formatted_datetime():
     now = datetime.now(SAO_PAULO_TZ)
     return now.strftime('%d/%m/%Y_%Hh%M')
                       
-
 @router.post("/predict/{modelo}")
 async def predict_knr(modelo: str, data: Predict):
     supabase = create_supabase_client()
@@ -133,8 +132,6 @@ async def update_user(predict_id: int, predict_update: Predict_update):
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
-
-
 
 @router.delete("/delete/{predict_id}")
 async def delete_predict(predict_id: int):

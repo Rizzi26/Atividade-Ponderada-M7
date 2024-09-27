@@ -19,53 +19,27 @@ def get_formatted_datetime():
     now = datetime.now(SAO_PAULO_TZ)
     return now.strftime('%d/%m/%Y_%Hh%M')
 
-# @router.post("/register/")
-# async def create_log(log: LogCreate):
-#     supabase = create_supabase_client()
-
-#     try:
-#         response = supabase.table('logs').insert({
-#             "username_log": log.username_log,
-#             "action": log.action,
-#             "user_id": log.user_id,
-#             "date": get_formatted_datetime()
-#         }).execute()
-
-#         return response.data
-#     except Exception as e:
-#         error_trace = traceback.format_exc()
-#         print(f"Full error trace: {error_trace}")
-
-#         return JSONResponse(content={"error": str(e), "trace": error_trace}, status_code=400)
-
 async def create_log(username_log: str, action: str, user_id: int = None):
     supabase = create_supabase_client()
 
     try:
-        # Cria o payload para o log
         log_data = {
             "username_log": username_log,
             "action": action,
             "date": get_formatted_datetime()
         }
 
-        # Adiciona o user_id ao payload se ele estiver presente
         if user_id is not None:
             log_data["user_id"] = user_id
 
-        # Executa a inserção no banco de dados do Supabase
         response = supabase.table('logs').insert(log_data).execute()
 
-        # Retorna os dados inseridos
         return response.data
 
     except Exception as e:
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         raise HTTPException(status_code=500, detail=f"Erro ao registrar log: {str(e)}")
-
-
-    
 
 @router.get("/list/")
 async def list_logs():
@@ -84,7 +58,6 @@ async def list_logs():
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
 
-
 @router.get("/get/{log_id}")
 async def get_log(log_id: int):
     supabase = create_supabase_client()
@@ -101,7 +74,6 @@ async def get_log(log_id: int):
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
-
 
 @router.put("/update/{log_id}")
 async def update_user(log_id: int, log_update: LogUpdate):
@@ -124,8 +96,6 @@ async def update_user(log_id: int, log_update: LogUpdate):
         error_trace = traceback.format_exc()
         print(f"Full error trace: {error_trace}")
         return JSONResponse(content={"error": "Erro interno do servidor", "trace": error_trace}, status_code=500)
-
-    
 
 @router.delete("/delete/{log_id}")
 async def delete_user(log_id: int):

@@ -9,6 +9,7 @@ CREATE TABLE predict (
     username_predict text,
     date text,
     forecast bool,
+    forecast_result json,
     model text,
     user_id integer REFERENCES users (id)
 );
