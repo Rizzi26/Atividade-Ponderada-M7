@@ -95,19 +95,17 @@ sudo systemctl enable docker
 - Utiliza `uvicorn` para iniciar a API no FastAPI.
 
 ```python
-    FROM python:3.10
+FROM python:3.11-bullseye
 
-    WORKDIR /app
+EXPOSE 8000
 
-    COPY requirements.txt ./
+WORKDIR /app
 
-    RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 
-    COPY . .
+RUN pip install -r requirements.txt
 
-    EXPOSE 3000
-
-    CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
 **2 -** Imagem do frontend:
@@ -127,21 +125,13 @@ sudo systemctl enable docker
 - Utiliza `npm start` para iniciar o serviço.
 
 ```python
-    FROM node:20
+FROM node:18-alpine
 
-    WORKDIR /app
-
-    COPY package*.json ./
-
-    RUN npm install
-
-    COPY . .
-
-    RUN npm run build
-
-    EXPOSE 3000
-    
-    CMD ["npm", "start"]
+WORKDIR /app
+COPY . .
+RUN npm install   
+RUN npm run build
+CMD ["npm", "start"]
 ```
 
 ### Docker-Compose
